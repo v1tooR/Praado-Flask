@@ -3,44 +3,58 @@
 {% block title %}Adicionar Produto{% endblock %}
 
 {% block content %}
-<div class="pricing-header p-3 pb-md-4 mx-auto text-center">
-    <h1 class="display-4 fw-normal">Adicionar Produto</h1>
-    <p class="fs-5 text-muted">Preencha o formulário abaixo para adicionar um novo produto.</p>
-</div>
+<section class="page-header">
+    <div class="container text-center">
+        <h1 class="page-title">ADICIONAR PRODUTO</h1>
+        <p class="page-subtitle">Cadastre um novo item ao seu catálogo</p>
+    </div>
+</section>
 
-<div class="row">
-    <div class="col-md-8 offset-md-2">
-        <div class="card">
-            <div class="card-body">
-                <form method="post">
-                    <div class="mb-3">
-                        <label for="nome" class="form-label">Nome do Produto *</label>
-                        <input type="text" class="form-control" id="nome" name="nome" placeholder="Nome do produto" required>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="descricao" class="form-label">Descrição</label>
-                        <textarea class="form-control" id="descricao" name="descricao" rows="3" placeholder="Descrição do produto"></textarea>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="preco" class="form-label">Preço *</label>
-                        <div class="input-group">
-                            <span class="input-group-text">R$</span>
-                            <input type="number" class="form-control" id="preco" name="preco" step="0.01" min="0" placeholder="0.00" required>
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Informações do Produto</h5>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post">
+                        <div class="row">
+                            <div class="col-12 mb-4">
+                                <label for="nome" class="form-label">Nome do Produto *</label>
+                                <input type="text" class="form-control" id="nome" name="nome" placeholder="Digite o nome do produto" required>
+                            </div>
+                            
+                            <div class="col-12 mb-4">
+                                <label for="descricao" class="form-label">Descrição</label>
+                                <textarea class="form-control" id="descricao" name="descricao" rows="3" placeholder="Descreva o produto detalhadamente"></textarea>
+                                <div class="form-text">Uma boa descrição ajuda seus clientes a entenderem melhor o produto.</div>
+                            </div>
+                            
+                            <div class="col-md-6 mb-4">
+                                <label for="preco" class="form-label">Preço *</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">R$</span>
+                                    <input type="number" class="form-control" id="preco" name="preco" step="0.01" min="0" placeholder="0.00" required>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6 mb-4">
+                                <label for="quantidade" class="form-label">Quantidade em Estoque *</label>
+                                <input type="number" class="form-control" id="quantidade" name="quantidade" min="0" placeholder="0" required>
+                            </div>
+                            
+                            <div class="col-12 mt-3 text-end">
+                                <a href="{{ url_for('index') }}" class="btn btn-secondary me-2">
+                                    <i class="fas fa-times me-2"></i>Cancelar
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-2"></i>Salvar Produto
+                                </button>
+                            </div>
                         </div>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="quantidade" class="form-label">Quantidade em Estoque *</label>
-                        <input type="number" class="form-control" id="quantidade" name="quantidade" min="0" placeholder="0" required>
-                    </div>
-                    
-                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                        <a href="{{ url_for('index') }}" class="btn btn-secondary me-md-2">Cancelar</a>
-                        <button type="submit" class="btn btn-primary">Salvar</button>
-                    </div>
-                </form>
+                    </form>
+                </div>
             </div>
         </div>
     </div>

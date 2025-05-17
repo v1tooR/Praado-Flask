@@ -5,6 +5,7 @@ from datetime import datetime
 
 # Configuração da aplicação Flask
 app = Flask(__name__)
+app.secret_key = 'praado_store'  # Necessário para usar flash messages
 
 # Configurações do banco de dados
 DATABASE = 'database.db'
@@ -14,39 +15,6 @@ def get_db_connection():
     conn = sqlite3.connect(DATABASE)
     conn.row_factory = sqlite3.Row  # Para acessar colunas pelo nome
     return conn
-
-# Função para inicializar o banco de dados
-def init_db():
-        
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        
-        # Cria a tabela de produtos
-        cursor.execute('''
-        CREATE TABLE IF NOT EXISTS produtos (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            nome TEXT NOT NULL,
-            descricao TEXT,
-            preco REAL NOT NULL,
-            quantidade INTEGER NOT NULL,
-            data_cadastro TEXT NOT NULL
-        )
-        ''')
-        
-        # Insere alguns produtos de exemplo
-        cursor.execute('''
-        INSERT INTO produtos (nome, descricao, preco, quantidade, data_cadastro)
-        VALUES 
-        ('Smartphone XYZ', 'Smartphone com câmera de alta resolução', 1299.99, 10, ?),
-        ('Notebook ABC', 'Notebook com processador de última geração', 3499.99, 5, ?),
-        ('Mouse sem fio', 'Mouse ergonômico com tecnologia bluetooth', 89.90, 20, ?)
-        ''', (datetime.now().strftime('%Y-%m-%d %H:%M:%S'), 
-              datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-              datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
-        
-        conn.commit()
-        conn.close()
-        print("Banco de dados inicializado com sucesso!")
 
 # Rota para a página inicial - Lista todos os produtos
 @app.route('/')
@@ -152,5 +120,4 @@ def excluir_produto(id):
 
 # Inicializa o banco de dados e inicia a aplicação
 if __name__ == '__main__':
-    init_db()
     app.run(debug=True)
