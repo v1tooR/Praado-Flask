@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}Adicionar Produto{% endblock %}
+
+{% block content %}
+<div class="pricing-header p-3 pb-md-4 mx-auto text-center">
+    <h1 class="display-4 fw-normal">Adicionar Produto</h1>
+    <p class="fs-5 text-muted">Preencha o formulário abaixo para adicionar um novo produto.</p>
+</div>
+
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="card">
+            <div class="card-body">
+                <form method="post">
+                    <div class="mb-3">
+                        <label for="nome" class="form-label">Nome do Produto *</label>
+                        <input type="text" class="form-control" id="nome" name="nome" placeholder="Nome do produto" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="descricao" class="form-label">Descrição</label>
+                        <textarea class="form-control" id="descricao" name="descricao" rows="3" placeholder="Descrição do produto"></textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="preco" class="form-label">Preço *</label>
+                        <div class="input-group">
+                            <span class="input-group-text">R$</span>
+                            <input type="number" class="form-control" id="preco" name="preco" step="0.01" min="0" placeholder="0.00" required>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="quantidade" class="form-label">Quantidade em Estoque *</label>
+                        <input type="number" class="form-control" id="quantidade" name="quantidade" min="0" placeholder="0" required>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('index') }}" class="btn btn-secondary me-md-2">Cancelar</a>
+                        <button type="submit" class="btn btn-primary">Salvar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
