@@ -1,0 +1,198 @@
+{% extends 'base.html' %}
+
+{% block title %}Lista de Produtos{% endblock %}
+
+{% block content %}
+
+
+<body>
+
+    <div class="container py-5">
+
+        <!-- Cabeçalho da Página -->
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4 bg-black">
+            <div>
+                <h1 class="fw-bold text-white mt-md-2 mx-2">PRAADO STORE</h1>
+            </div>
+            <div class="d-flex align-items-center gap-3  mt-md-0 mx-2">
+                <span class="text-secondary">{{ produtos|length }} Produtos</span>
+                <select id="sort-by" class="form-select bg-dark text-white border-secondary" style="width: auto;">
+                    <option selected></option>
+                    <option value="preco_menor">Menor Preço</option>
+                    <option value="preco_maior">Maior Preço</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="row g-4">
+
+            <!-- Barra Lateral de Filtros -->
+            <aside class="col-12 col-lg-3">
+                <div class="bg-black p-4 rounded shadow-sm">
+                    <!-- Filtro de Preço -->
+                    <div class="mb-4">
+                        <h3 class="fw-semibold text-white mb-3 border-bottom border-danger pb-2 d-inline-block">Preço</h3>
+                        <div class="d-flex justify-content-between text-secondary mb-2">
+                            <span>R$ 0</span>
+                            <span id="rangeValue">0</span>
+                            <span>R$ {{maior_preco}}</span>
+                        </div>
+                        <input id="range1" type="range" class="form-range" min="0" max={{maior_preco}} value={{maior_preco}}>
+                    </div>
+
+                    <!-- Filtro de categoria -->
+                    <div class="mb-4" id="categoria-filter">
+                        <h3 class="fw-semibold text-white mb-3 border-bottom border-danger pb-2 d-inline-block">Tipo de produto</h3>
+                        {% for categoria in categorias %}
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox"  id="montadoCheck" value = {{categoria.Categoria}}>
+                            <label class="form-check-label d-flex justify-content-between" for="montadoCheck">
+                                <span class="text-light">{{ categoria.Categoria }}</span>
+                            </label>
+                        </div>
+                        {% endfor %}
+                        
+                    </div>
+
+                    
+                </div>
+            </aside>
+
+            <!-- Grid de Produtos -->
+            <main class="col-12 col-lg-9">
+                <div class="row row-cols-1 row-cols-sm-2 row-cols-xl-3 g-4" id="product-grid">
+
+                    <!-- Loop para gerar os cards de produto dinamicamente -->
+                    {% for produto in produtos %}
+
+                    <a class ='product-card' href="{{ url_for('visualizar_produto_cliente',  id=produto['id'])}}" data-preco={{produto.preco}} data-categoria= {{produto.Categoria}}>
+                        <div class="col" data-preco={{produto.preco}} data-categoria= {{produto.Categoria}} >
+                            <div class="card h-100 bg-black text-white shadow border-secondary">
+                                <div class="card-body d-flex flex-column">
+                                    <h2 class="card-title fs-6 fw-semibold text-light">{{ produto.nome }}</h2>
+                                    <div class="mt-auto">
+                                        <img src= {{ produto.image_url }} class="card-img-top p-3" alt={{ produto.name }}>
+                                        <p class="h4 fw-bold text-danger mb-1">R$ {{ produto.preco }}</p>
+                                        <p class="text-success small">à vista com 15% de desconto no PIX</p>
+                                        <p class="text-secondary"><small>Sem juros no cartão</small></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                    {% endfor %}
+
+                </div>
+            </main>
+
+        </div>
+    </div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" xintegrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+<script>
+
+        const rangeInput = document.getElementById('range1');
+
+
+        const spanDisplay = document.getElementById('rangeValue');
+
+        
+        rangeInput.addEventListener('input', function() {
+
+            const valorAtual = rangeInput.value;
+
+            spanDisplay.textContent = valorAtual;
+        });
+
+    </script>
+
+<!-- Script para Filtros e Ordenação -->
+<script>
+    // Aguarda o conteúdo da página carregar completamente
+    document.addEventListener('DOMContentLoaded', function () {
+
+        // --- 1. Seleção dos Elementos ---
+        const priceRange = document.getElementById('range1');
+        const priceValueSpan = document.getElementById('rangeValue');
+        const CategoriaCheckboxes = document.querySelectorAll('#categoria-filter input[type="checkbox"]');
+        const sortBySelect = document.getElementById('sort-by');
+        const productGrid = document.getElementById('product-grid');
+        const allProducts = Array.from(productGrid.querySelectorAll('.product-card'));
+
+        // --- 2. Função Principal para Atualizar a Grade ---
+        function updateGrid() {
+            // --- A. Leitura dos Filtros ---
+            const maxPrice = parseFloat(priceRange.value);
+
+            // Pega os valores dos checkboxes de categoria que estão marcados
+            const selectedMontagens = Array.from(CategoriaCheckboxes)
+                .filter(cb => cb.checked).map(cb => cb.value);
+            
+            // Pega os valores dos checkboxes de fabricante que estão marcados
+
+            // --- B. Lógica de Filtragem ---
+            // Percorre cada produto e decide se ele deve ser mostrado ou não
+            const visibleProducts = allProducts.filter(product => {
+                const price = parseFloat(product.dataset.preco);
+                const categoria= product.dataset.categoria;
+                
+
+                // Condição 1: Preço
+                const priceMatch = price <= maxPrice;
+
+                // Condição 2: categoria
+                // Mostra o produto se nenhuma opção de categoria foi selecionada,
+                // ou se a categoria do produto está na lista de selecionadas.
+                const categoriaMatch = selectedMontagens.length === 0 || selectedMontagens.includes(categoria);
+
+                // O produto só será visível se todas as condições forem verdadeiras
+                return priceMatch && categoriaMatch;
+            });
+
+            // Esconde todos os produtos para depois mostrar apenas os filtrados
+            allProducts.forEach(product => product.style.display = 'none');
+
+
+            // --- C. Lógica de Ordenação ---
+            const sortBy = sortBySelect.value;
+            if (sortBy === 'preco_menor') {
+                visibleProducts.sort((a, b) => parseFloat(a.dataset.preco) - parseFloat(b.dataset.preco));
+            } else if (sortBy === 'preco_maior') {
+                visibleProducts.sort((a, b) => parseFloat(b.dataset.preco) - parseFloat(a.dataset.preco));
+            }
+            // Para 'relevancia', não fazemos nada, mantendo a ordem original.
+
+            // --- D. Atualização do DOM ---
+            // Adiciona os produtos filtrados e ordenados de volta na grade e os torna visíveis.
+            visibleProducts.forEach(product => {
+                product.style.display = ''; // Mostra o produto
+                productGrid.appendChild(product); // Re-anexa para garantir a ordem
+            });
+        }
+
+        // --- 3. Adicionar "Ouvintes" de Eventos ---
+        // Adiciona um gatilho para a função updateGrid sempre que um filtro for alterado.
+
+        // Para o slider de preço (evento 'input' para atualização em tempo real)
+        priceRange.addEventListener('input', () => {
+            priceValueSpan.textContent = parseFloat(priceRange.value).toLocaleString('pt-BR');
+            updateGrid();
+        });
+
+        // Para todos os checkboxes
+        document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+            checkbox.addEventListener('change', updateGrid);
+        });
+
+        // Para o seletor de ordenação
+        sortBySelect.addEventListener('change', updateGrid);
+        
+        // --- 4. Execução Inicial ---
+        // Garante que o valor do preço seja exibido corretamente ao carregar a página
+        priceValueSpan.textContent = parseFloat(priceRange.value).toLocaleString('pt-BR');
+    });
+</script>
+
+
+</html>
+
+{% endblock %}

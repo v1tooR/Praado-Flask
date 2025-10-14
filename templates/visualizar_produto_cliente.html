@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block title %}Lista de Produtos{% endblock %}
+
+{% block content %}
+
+<body>
+
+<div class="container">
+    <div class="product-container shadow-sm">
+        <div class="row g-5">
+            <!-- Coluna da Imagem -->
+            <div class="col-md-6 text-center">
+                <img src="{{ produto.imagem_url }}" alt="{{ produto.nome }}" class="product-image">
+            </div>
+
+            <!-- Coluna de Informações do Produto -->
+            <div class="col-md-6 d-flex flex-column">
+                <!-- Nome do Produto -->
+                <h1 class="h3">{{ produto.nome }}</h1>
+                <p class="text-muted small">Entregue por Riachuelo</p>
+
+                <!-- Preço -->
+                <div class="my-3">
+                    <p class="price mb-1">R$ {{ "%.2f"|format(produto.preco) }}</p>
+                </div>
+
+                <!-- Parcelamento -->
+                <div class="installments-card d-flex justify-content-between align-items-center mb-4">
+                    <span>{{ produto.parcelamento }} no Cartão Riachuelo</span>
+                    <i class="bi bi-credit-card-2-front fs-4"></i>
+                </div>
+
+                <!-- Cor -->
+                <div class="mb-4">
+                    <p class="mb-1"><strong>Cor:</strong> {{ produto.cor }}</p>
+                    <div class="color-swatch"></div>
+                </div>
+
+                <!-- Tamanho -->
+                <div class="mb-4">
+                    <p class="mb-1"><strong>Tamanho</strong></p>
+                    <div class="btn-group" role="group" aria-label="Seleção de tamanho">
+                        {% for tamanho in produto.tamanhos %}
+                        <input type="radio" class="btn-check" name="tamanho" id="tamanho-{{ tamanho }}" autocomplete="off">
+                        <label class="btn btn-outline-secondary size-btn" for="tamanho-{{ tamanho }}">{{ tamanho }}</label>
+                        {% endfor %}
+                    </div>
+                </div>
+                <!-- Links Úteis -->
+                <div class="d-flex small gap-3 mb-4 text-muted">
+                    <a href="#" class="text-reset text-decoration-none"><i class="bi bi-person-bounding-box me-1"></i>Provador Virtual</a>
+                    <a href="#" class="text-reset text-decoration-none"><i class="bi bi-rulers me-1"></i>Tabela de Medidas</a>
+                </div>
+
+                <!-- Botão de Adicionar à Sacola -->
+                <div class="d-grid mt-auto">
+                    <button class="btn btn-success btn-lg">
+                        <i class="bi bi-bag-plus-fill me-2"></i>Adicionar à sacola
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+{% endblock %}

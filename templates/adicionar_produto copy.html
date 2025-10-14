@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block title %}Adicionar Produto{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div class="container text-center">
+        <h1 class="page-title">ADICIONAR PRODUTO</h1>
+        <p class="page-subtitle">Cadastre um novo item ao seu catálogo</p>
+    </div>
+</section>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Informações do Produto</h5>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post">
+                        <div class="row">
+                            <div class="col-12 mb-4">
+                                <label for="nome" class="form-label">Nome do Produto *</label>
+                                <input type="text" class="form-control" id="nome" name="nome" placeholder="Digite o nome do produto" required>
+                            </div>
+                            
+                            <div class="col-12 mb-4">
+                                <label for="descricao" class="form-label">Descrição</label>
+                                <textarea class="form-control" id="descricao" name="descricao" rows="3" placeholder="Descreva o produto detalhadamente"></textarea>
+                                <div class="form-text">Uma boa descrição ajuda seus clientes a entenderem melhor o produto.</div>
+                            </div>
+                            
+                            <div class="col-md-6 mb-4">
+                                <label for="preco" class="form-label">Preço *</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">R$</span>
+                                    <input type="number" class="form-control" id="preco" name="preco" step="0.01" min="0" placeholder="0.00" required>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6 mb-4">
+                                <label for="quantidade" class="form-label">Quantidade em Estoque *</label>
+                                <input type="number" class="form-control" id="quantidade" name="quantidade" min="0" placeholder="0" required>
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <label for="categoria" class="form-label">Categoria *</label>
+                                    <select  id="categoria" class = 'form-select' name="categoria">
+                                        <option selected></option>
+                                        {% for categoria in categorias %}
+                                        <option value={{categoria.Categoria}}>{{categoria.Categoria}}</option>
+                                        {% endfor %}
+                                    </select>
+                                
+                            </div>
+                            
+                            <div class="col-md-6 mb-4">
+                                <p class="mb-1"><strong>Tamanho</strong></p>
+                                <div class="btn-group" role="group" aria-label="Seleção de tamanho">
+                                    
+                                    <input type="radio" class="btn-check" name="tamanho" id="tamanho-G" autocomplete="off">
+                                    <label class="btn btn-outline-secondary size-btn" for="tamanho-G">G</label>
+                                    <input type="radio" class="btn-check" name="tamanho" id="tamanho-GG" autocomplete="off">
+                                    <label class="btn btn-outline-secondary size-btn" for="tamanho-GG">GG</label>
+                                    <input type="radio" class="btn-check" name="tamanho" id="tamanho-M" autocomplete="off">
+                                    <label class="btn btn-outline-secondary size-btn" for="tamanho-M">M</label>
+                                    
+                                </div>
+                            </div>
+                            
+                            <div class="col-12 mt-3 text-end">
+                                <a href="{{ url_for('index') }}" class="btn btn-secondary me-2">
+                                    <i class="fas fa-times me-2"></i>Cancelar
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-2"></i>Salvar Produto
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

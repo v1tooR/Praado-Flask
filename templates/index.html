@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+
+{% block title %}Lista de Produtos{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div class="container text-center">
+        <h1 class="page-title">CATÁLOGO DE PRODUTOS</h1>
+        <p class="page-subtitle">Gerencie seu inventário com facilidade e elegância</p>
+        <a href="{{ url_for('adicionar_produto') }}" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i>Adicionar Produto
+        </a>
+    </div>
+</section>
+
+<div class="container">
+    {% if produtos %}
+        <div class="card">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th scope="col">ID</th>
+                            <th scope="col">PRODUTO</th>
+                            <th scope="col">PREÇO</th>
+                            <th scope="col">ESTOQUE</th>
+                            <th scope="col" class="text-end">AÇÕES</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for produto in produtos %}
+                        <tr>
+                            <td>{{ produto['id'] }}</td>
+                            <td>
+                                <strong>{{ produto['nome'] }}</strong>
+                                {% if produto['descricao'] %}
+                                <br><small class="text-muted">{{ produto['descricao']|truncate(60) }}</small>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="fw-bold">R$ {{ "%.2f"|format(produto['preco']|float) }}</div>
+                            </td>
+                            <td>
+                                <span class="d-inline-block">
+                                    {{ produto['quantidade'] }}
+                                    {% if produto['quantidade'] == 0 %}
+                                        <span class="badge bg-danger ms-2">Esgotado</span>
+                                    {% elif produto['quantidade'] < 5 %}
+                                        <span class="badge bg-warning text-dark ms-2">Baixo</span>
+                                    {% else %}
+                                        <span class="badge bg-success ms-2">Em Estoque</span>
+                                    {% endif %}
+                                </span>
+                            </td>
+                            <td class="text-end">
+                                <div class="btn-group" role="group">
+                                    <a href="{{ url_for('visualizar_produto', id=produto['id']) }}" class="btn btn-sm btn-secondary">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="{{ url_for('editar_produto', id=produto['id']) }}" class="btn btn-sm btn-warning">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ produto['id'] }}">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                                
+                                <!-- Modal de confirmação para exclusão -->
+                                <div class="modal fade" id="deleteModal{{ produto['id'] }}" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="deleteModalLabel">Confirmar Exclusão</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p>Tem certeza que deseja excluir o produto <strong>"{{ produto['nome'] }}"</strong>?</p>
+                                                <p class="text-danger"><i class="fas fa-exclamation-triangle me-2"></i>Esta ação não pode ser desfeita.</p>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                                <form action="{{ url_for('excluir_produto', id=produto['id']) }}" method="post">
+                                                    <button type="submit" class="btn btn-danger">Excluir</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-box-open fa-4x mb-3 text-muted"></i>
+            <h3>Nenhum produto cadastrado</h3>
+            <p class="text-muted">Adicione produtos ao seu catálogo para começar.</p>
+            <a href="{{ url_for('adicionar_produto') }}" class="btn btn-primary mt-3">
+                <i class="fas fa-plus me-2"></i>Adicionar Produto
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
