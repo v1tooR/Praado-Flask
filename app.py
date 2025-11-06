@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash,session
 import sqlite3
 import os
 from datetime import datetime
@@ -154,6 +154,72 @@ def visualizar_produto_cliente(id):
 @app.route('/teste')
 def visualizar_produto_Teste():
     return render_template('visualizar_produto_cliente.html')
+@app.route('/login/' , methods = ['GET','POST'])
+def login():
+    if request.method  == 'POST':
+        email = request.form['email']
+        password = request.form['password']
+        conn = get_db_connection()
+        conta = conn.execute('SELECT * FROM contas WHERE email = ?', (email,)).fetchone()
+        conn.close()
+        if not email:
+            flash('O Email é obrigatório!', 'danger')
+        elif not password:
+            flash('Senha é obrigatório!', 'danger')
+        elif conta is None:
+            flash('Email ou senha incorretos')
+        elif conta['password'] != password:
+            flash('Email ou Senha incorretos')
+        session['is_logged'] = True
+        session['nickname'] = conta['nickname']
+        session['is_admin'] = conta['is_admin']
+        if conta['is_admin']:
+            return redirect(url_for('index'))
+        return redirect(url_for('catalogo'))
+
+    return render_template('login.html')
+@app.route('/register/', methods=['GET', 'POST'])
+def register():
+
+    if request.method == 'POST':
+
+        email = request.form['email']
+        password = request.form['password']
+        password_confirm = request.form['password_confirm']
+        nickname = request.form['nickname']
+        conn = get_db_connection()
+        conta = conn.execute('SELECT * FROM contas WHERE email = ?', (email,)).fetchone()
+        conn.close()
+        if not email:
+            flash('O Email é obrigatório!', 'danger')
+        elif not password:
+            flash('Senha é obrigatório!', 'danger')
+        elif not password_confirm:
+            flash('A confirmação da senha é obrigatória!', 'danger')
+        elif password != password_confirm:
+            flash('A confirmação da senha precisa ser igual a senha!', 'danger')
+        elif conta is not None:
+            flash('Esse Email já possui cadastro no sistema', 'danger')
+        else:
+            conn = get_db_connection()
+            conn.execute(
+                'INSERT INTO contas (email, password, nickname) VALUES (?, ?, ?)',
+                (email, password,nickname)
+            )
+            conn.commit()
+            conn.close()
+            flash('Cadastro efetuado com sucesso!', 'success')
+            return redirect(url_for('login'))
+
+
+    return render_template('register.html')
+
+@app.route('/logout/')
+def logout():
+    session.clear()
+
+    flash('Você saiu da sua conta.', 'info')
+    return redirect(url_for('login'))
 
 # Inicializa o banco de dados e inicia a aplicação
 if __name__ == '__main__':

@@ -297,15 +297,32 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
+                    {% if session.is_admin %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('index') }}">Gerenciador de inventário</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('catalogo') }}">CATÁLOGO</a>
+                        <a class="nav-link" href="{{ url_for('index') }}">GERENCIADOR DE INVENTÁRIO</a>
+
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('adicionar_produto') }}">NOVO PRODUTO</a>
                     </li>
+                    {% endif %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('catalogo') }}">CATÁLOGO</a>
+                    </li>
+                    {% if session.is_logged %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('logout') }}">
+                                <img width="20px" src="https://img.icons8.com/?size=100&id=n5UlZzfuGwnQ&format=png&color=000000" style="filter: invert(100%);" ></img>
+                        </a>
+                    </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('login') }}">
+                                <img width="20px" src="https://img.icons8.com/?size=100&id=26218&format=png&color=000000" style="filter: invert(100%);" ></img>
+                            </a>
+                    </li>
+                    {% endif %}
+
                 </ul>
             </div>
         </div>

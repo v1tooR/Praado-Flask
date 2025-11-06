@@ -3,6 +3,12 @@
 {% block title %}Lista de Produtos{% endblock %}
 
 {% block content %}
+<section class="page-header">
+    <div class="container text-center">
+        <h1 class="page-title"></h1>
+        <p class="page-subtitle"></p>
+    </div>
+</section>
 
 <body>
 
@@ -27,24 +33,22 @@
 
                 <!-- Parcelamento -->
                 <div class="installments-card d-flex justify-content-between align-items-center mb-4">
-                    <span>{{ produto.parcelamento }} no Cartão Riachuelo</span>
+                    <span> no Cartão Riachuelo</span>
                     <i class="bi bi-credit-card-2-front fs-4"></i>
                 </div>
 
                 <!-- Cor -->
                 <div class="mb-4">
-                    <p class="mb-1"><strong>Cor:</strong> {{ produto.cor }}</p>
+                    <p class="mb-1"><strong>Cor:</strong> PRETO</p>
                     <div class="color-swatch"></div>
                 </div>
 
-                <!-- Tamanho -->
+                <!-- Tamanho-->
                 <div class="mb-4">
                     <p class="mb-1"><strong>Tamanho</strong></p>
                     <div class="btn-group" role="group" aria-label="Seleção de tamanho">
-                        {% for tamanho in produto.tamanhos %}
-                        <input type="radio" class="btn-check" name="tamanho" id="tamanho-{{ tamanho }}" autocomplete="off">
-                        <label class="btn btn-outline-secondary size-btn" for="tamanho-{{ tamanho }}">{{ tamanho }}</label>
-                        {% endfor %}
+                        <input type="radio" class="btn-check" name="tamanho" id="tamanho-G" autocomplete="off">
+                        <label class="btn btn-outline-secondary size-btn" for="tamanho-G">G</label>
                     </div>
                 </div>
                 <!-- Links Úteis -->

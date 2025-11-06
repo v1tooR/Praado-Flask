@@ -54,47 +54,6 @@
                                 
                             </div>
                             
-                            <!-- COMPONENTE DA TABELA DE ESTOQUE INSERIDO AQUI -->
-                                <div class="col-12 mt-3 mb-4">
-                                    <h6 class="mb-3">Variações de Estoque por Cor e Tamanho</h6>
-                                    <table class="table table-bordered align-middle">
-                                        <thead class="table-light">
-                                            <tr>
-                                                <th scope="col">Cor</th>
-                                                <th scope="col" class="text-center">P</th>
-                                                <th scope="col" class="text-center">M</th>
-                                                <th scope="col" class="text-center">G</th>
-                                                <th scope="col" class="text-center">GG</th>
-                                                <th scope="col" class="text-center" style="width: 120px;">Ação</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="tabela-variacoes">
-                                            <!-- Linha inicial como modelo -->
-                                            <tr>
-                                                <td>
-                                                    <input type="text" class="form-control" name="cor[]" placeholder="Ex: Amarelo Claro" required>
-                                                </td>
-                                                <td>
-                                                    <input type="number" class="form-control" name="estoque_p[]" min="0" value="0">
-                                                </td>
-                                                <td>
-                                                    <input type="number" class="form-control" name="estoque_m[]" min="0" value="0">
-                                                </td>
-                                                <td>
-                                                    <input type="number" class="form-control" name="estoque_g[]" min="0" value="0">
-                                                </td>
-                                                <td>
-                                                    <input type="number" class="form-control" name="estoque_gg[]" min="0" value="0">
-                                                </td>
-                                                <td class="text-center">
-                                                    <button type="button" class="btn btn-danger btn-sm remover-linha">Remover</button>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                    <button type="button" id="adicionar-linha" class="btn btn-success btn-sm">Adicionar Nova Cor</button>
-                                </div>
-                                <!-- FIM DO COMPONENTE -->
 
                             <div class="col-12 mt-3 text-end">
                                 <a href="{{ url_for('index') }}" class="btn btn-secondary me-2">
@@ -112,48 +71,5 @@
     </div>
 </div>
 
-<script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const botaoAdicionar = document.getElementById('adicionar-linha');
-            const corpoTabela = document.getElementById('tabela-variacoes');
 
-            // --- FUNÇÃO PARA ADICIONAR UMA NOVA LINHA ---
-            botaoAdicionar.addEventListener('click', function () {
-                const novaLinha = document.createElement('tr');
-                novaLinha.innerHTML = `
-                    <td>
-                        <input type="text" class="form-control" name="cor[]" placeholder="Nova cor" required>
-                    </td>
-                    <td>
-                        <input type="number" class="form-control" name="estoque_p[]" min="0" value="0">
-                    </td>
-                    <td>
-                        <input type="number" class="form-control" name="estoque_m[]" min="0" value="0">
-                    </td>
-                    <td>
-                        <input type="number" class="form-control" name="estoque_g[]" min="0" value="0">
-                    </td>
-                    <td>
-                        <input type="number" class="form-control" name="estoque_gg[]" min="0" value="0">
-                    </td>
-                    <td class="text-center">
-                        <button type="button" class="btn btn-danger btn-sm remover-linha">Remover</button>
-                    </td>
-                `;
-                corpoTabela.appendChild(novaLinha);
-            });
-
-            // --- FUNÇÃO PARA REMOVER UMA LINHA ---
-            corpoTabela.addEventListener('click', function (event) {
-                if (event.target.classList.contains('remover-linha')) {
-                    if (corpoTabela.rows.length > 1) {
-                        const linhaParaRemover = event.target.closest('tr');
-                        linhaParaRemover.remove();
-                    } else {
-                        alert('É necessário manter pelo menos uma variação de cor.');
-                    }
-                }
-            });
-        });
-    </script>
 {% endblock %}
