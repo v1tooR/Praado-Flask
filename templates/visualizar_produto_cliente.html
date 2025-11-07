@@ -4,13 +4,12 @@
 
 {% block content %}
 <section class="page-header">
-    <div class="container text-center">
-        <h1 class="page-title"></h1>
-        <p class="page-subtitle"></p>
-    </div>
+
 </section>
 
 <body>
+<form action="/adicionar-ao-carrinho/" method="POST">
+<input type="hidden" name="produto_id" value={{ produto.id }}>
 
 <div class="container">
     <div class="product-container shadow-sm">
@@ -24,7 +23,7 @@
             <div class="col-md-6 d-flex flex-column">
                 <!-- Nome do Produto -->
                 <h1 class="h3">{{ produto.nome }}</h1>
-                <p class="text-muted small">Entregue por Riachuelo</p>
+                <p class="text-muted small">Entregue por correios</p>
 
                 <!-- Preço -->
                 <div class="my-3">
@@ -33,33 +32,44 @@
 
                 <!-- Parcelamento -->
                 <div class="installments-card d-flex justify-content-between align-items-center mb-4">
-                    <span> no Cartão Riachuelo</span>
+                    <span> À vista</span>
                     <i class="bi bi-credit-card-2-front fs-4"></i>
                 </div>
 
-                <!-- Cor -->
+                <!-- Cor  (Falta desenvolver o banco de dados para um modelo relacional)
                 <div class="mb-4">
                     <p class="mb-1"><strong>Cor:</strong> PRETO</p>
                     <div class="color-swatch"></div>
-                </div>
+                </div> -->
 
-                <!-- Tamanho-->
+                <!-- Tamanho (Falta desenvolver o banco de dados para um modelo relacional)
                 <div class="mb-4">
                     <p class="mb-1"><strong>Tamanho</strong></p>
                     <div class="btn-group" role="group" aria-label="Seleção de tamanho">
                         <input type="radio" class="btn-check" name="tamanho" id="tamanho-G" autocomplete="off">
                         <label class="btn btn-outline-secondary size-btn" for="tamanho-G">G</label>
                     </div>
-                </div>
+                </div>  -->
                 <!-- Links Úteis -->
-                <div class="d-flex small gap-3 mb-4 text-muted">
-                    <a href="#" class="text-reset text-decoration-none"><i class="bi bi-person-bounding-box me-1"></i>Provador Virtual</a>
-                    <a href="#" class="text-reset text-decoration-none"><i class="bi bi-rulers me-1"></i>Tabela de Medidas</a>
-                </div>
 
+                <div class="mb-4 pt-3 border-top">
+                    <p class="mb-2"><strong><i class="bi bi-truck"></i> Consulte o frete</strong></p>
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Digite o seu CEP" id="cep-input" maxlength="9">
+                        <!--
+                          IMPORTANTE: 'type="button"' impede que este botão envie o formulário
+                          de "Adicionar ao Carrinho" que está por fora.
+                        -->
+                        <button class="btn btn-outline-secondary" type="button" id="btn-calcular-frete">OK</button>
+                    </div>
+                    <a href="https://buscacepinter.correios.com.br/app/endereco/index.php" class="small text-muted text-decoration-none">Não sei meu CEP</a>
+
+                    <!-- Div para exibir os resultados do cálculo -->
+                    <div id="resultado-frete" class="mt-3"></div>
+                </div>
                 <!-- Botão de Adicionar à Sacola -->
                 <div class="d-grid mt-auto">
-                    <button class="btn btn-success btn-lg">
+                    <button type = 'submit' class="btn btn-success btn-lg">
                         <i class="bi bi-bag-plus-fill me-2"></i>Adicionar à sacola
                     </button>
                 </div>
@@ -67,7 +77,7 @@
         </div>
     </div>
 </div>
-
+</form>
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>

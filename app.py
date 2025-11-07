@@ -173,6 +173,7 @@ def login():
         session['is_logged'] = True
         session['nickname'] = conta['nickname']
         session['is_admin'] = conta['is_admin']
+        session['carrinho'] = {}
         if conta['is_admin']:
             return redirect(url_for('index'))
         return redirect(url_for('catalogo'))
@@ -220,6 +221,66 @@ def logout():
 
     flash('Você saiu da sua conta.', 'info')
     return redirect(url_for('login'))
+
+@app.route('/carrinho')
+def carrinho():
+
+    produtos_no_carrinho  =  session['carrinho']
+    subtotal = sum(item['preco'] * item['quantidade'] for item in produtos_no_carrinho)
+    frete = 15.00  # Você também calcularia isso (ex: com uma API de frete)
+    total = subtotal + frete
+
+    return render_template(
+        'carrinho.html',
+        produtos=produtos_no_carrinho,
+        subtotal=subtotal,
+        frete=frete,
+        total=total
+    )
+
+@app.route('/adicionar-ao-carrinho')
+def adicionar_ao_carrinho():
+    try:
+        # Aqui está! Estamos pegando todos os argumentos enviados pelo formulário:
+
+        produto_id = request.form.get('produto_id')
+        quantidade = int(request.form.get('quantidade', 1))  # '1' é o valor padrão
+
+        # Obter o carrinho atual da sessão
+        carrinho_atual = session.get('carrinho', [])
+
+        # (A LÓGICA DE ADICIONAR/ATUALIZAR O CARRINHO QUE VIMOS ANTES)
+        item_encontrado = False
+        for item in carrinho_atual:
+            if (item['id'] == produto_id):
+                item['quantidade'] += quantidade
+                item_encontrado = True
+                break
+
+        if not item_encontrado:
+            novo_item = {
+                'id': produto_id,
+                'quantidade': quantidade,
+
+            }
+            carrinho_atual.append(novo_item)
+
+        # Salvar o carrinho atualizado de volta na sessão
+        session['carrinho'] = carrinho_atual
+        session.modified = True
+
+        flash('Produto adicionado ao carrinho!', 'success')
+
+    except Exception as e:
+        flash(f'Ocorreu um erro ao adicionar o produto: {e}', 'danger')
+
+        # Redireciona o usuário de volta para a página do carrinho
+    return redirect(url_for('carrinho'))
+@app.route('/remover-do-carrinho/<int:id_item_carrinho>')
+def remover_do_carrinho(id_item_carrinho):
+    pass
+
+
 
 # Inicializa o banco de dados e inicia a aplicação
 if __name__ == '__main__':
