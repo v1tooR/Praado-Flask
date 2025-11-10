@@ -139,8 +139,51 @@ def catalogo():
     conn.close()
     return render_template('catalogo.html',produtos = produtos, categorias = categorias , maior_preco = maior_preco )
 
-@app.route('/produto_cliente/<int:id>')
+@app.route('/produto_cliente/<int:id>', methods = ['GET','POST'])
 def visualizar_produto_cliente(id):
+    if request.method == 'POST':
+        try:
+            # Aqui está! Estamos pegando todos os argumentos enviados pelo formulário:
+
+            produto_id = request.form.get('produto_id')
+            quantidade = int(request.form.get('quantidade', 1))
+            # '1' é o valor padrão
+            preco = float(request.form.get('preco'))
+            nome = request.form.get('nome')
+            # Obter o carrinho atual da sessão
+            carrinho_atual = session.get('carrinho', [])
+            imagem_url = request.form.get('imagem_url')
+            # (A LÓGICA DE ADICIONAR/ATUALIZAR O CARRINHO QUE VIMOS ANTES)
+            item_encontrado = False
+            for item in carrinho_atual:
+                if (item['id'] == produto_id):
+                    item['quantidade'] += quantidade
+                    item_encontrado = True
+                    break
+
+            if not item_encontrado:
+                novo_item = {
+                    'id': produto_id,
+                    'quantidade': quantidade,
+                    'preco' : preco,
+                    'nome' : nome,
+                    'imagem_url': imagem_url
+
+                }
+                carrinho_atual.append(novo_item)
+
+            # Salvar o carrinho atualizado de volta na sessão
+            session['carrinho'] = carrinho_atual
+            session.modified = True
+
+            flash('Produto adicionado ao carrinho!', 'success')
+
+        except Exception as e:
+            flash(f'Ocorreu um erro ao adicionar o produto: {e}', 'danger')
+
+            # Redireciona o usuário de volta para a página do carrinho
+        return redirect(url_for('carrinho'))
+
     conn = get_db_connection()
     produto = conn.execute('SELECT * FROM produtos WHERE id = ?', (id,)).fetchone()
     conn.close()
@@ -173,7 +216,7 @@ def login():
         session['is_logged'] = True
         session['nickname'] = conta['nickname']
         session['is_admin'] = conta['is_admin']
-        session['carrinho'] = {}
+        session['carrinho'] = []
         if conta['is_admin']:
             return redirect(url_for('index'))
         return redirect(url_for('catalogo'))
@@ -240,42 +283,43 @@ def carrinho():
 
 @app.route('/adicionar-ao-carrinho')
 def adicionar_ao_carrinho():
-    try:
-        # Aqui está! Estamos pegando todos os argumentos enviados pelo formulário:
+    if request.method == 'POST':
+        try:
+            # Aqui está! Estamos pegando todos os argumentos enviados pelo formulário:
 
-        produto_id = request.form.get('produto_id')
-        quantidade = int(request.form.get('quantidade', 1))  # '1' é o valor padrão
+            produto_id = request.form.get('produto_id')
+            quantidade = int(request.form.get('quantidade', 1))  # '1' é o valor padrão
 
-        # Obter o carrinho atual da sessão
-        carrinho_atual = session.get('carrinho', [])
+            # Obter o carrinho atual da sessão
+            carrinho_atual = session.get('carrinho', [])
+            print(carrinho_atual)
+            # (A LÓGICA DE ADICIONAR/ATUALIZAR O CARRINHO QUE VIMOS ANTES)
+            item_encontrado = False
+            for item in carrinho_atual:
+                if (item['id'] == produto_id):
+                    item['quantidade'] += quantidade
+                    item_encontrado = True
+                    break
 
-        # (A LÓGICA DE ADICIONAR/ATUALIZAR O CARRINHO QUE VIMOS ANTES)
-        item_encontrado = False
-        for item in carrinho_atual:
-            if (item['id'] == produto_id):
-                item['quantidade'] += quantidade
-                item_encontrado = True
-                break
+            if not item_encontrado:
+                novo_item = {
+                    'id': produto_id,
+                    'quantidade': quantidade,
 
-        if not item_encontrado:
-            novo_item = {
-                'id': produto_id,
-                'quantidade': quantidade,
+                }
+                carrinho_atual.append(novo_item)
 
-            }
-            carrinho_atual.append(novo_item)
+            # Salvar o carrinho atualizado de volta na sessão
+            session['carrinho'] = carrinho_atual
+            session.modified = True
 
-        # Salvar o carrinho atualizado de volta na sessão
-        session['carrinho'] = carrinho_atual
-        session.modified = True
+            flash('Produto adicionado ao carrinho!', 'success')
 
-        flash('Produto adicionado ao carrinho!', 'success')
+        except Exception as e:
+            flash(f'Ocorreu um erro ao adicionar o produto: {e}', 'danger')
 
-    except Exception as e:
-        flash(f'Ocorreu um erro ao adicionar o produto: {e}', 'danger')
-
-        # Redireciona o usuário de volta para a página do carrinho
-    return redirect(url_for('carrinho'))
+            # Redireciona o usuário de volta para a página do carrinho
+        return redirect(url_for('carrinho'))
 @app.route('/remover-do-carrinho/<int:id_item_carrinho>')
 def remover_do_carrinho(id_item_carrinho):
     pass

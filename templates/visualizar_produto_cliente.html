@@ -8,8 +8,13 @@
 </section>
 
 <body>
-<form action="/adicionar-ao-carrinho/" method="POST">
+<form action="" method="POST">
 <input type="hidden" name="produto_id" value={{ produto.id }}>
+<input type="hidden" name="preco" value={{ produto.preco }}>
+<input type="hidden" name="nome" value={{ produto.nome }}>
+<input type="hidden" name="imagem_url" value={{ produto.imagem_url }}>
+
+
 
 <div class="container">
     <div class="product-container shadow-sm">
