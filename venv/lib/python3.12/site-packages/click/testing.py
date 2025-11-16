@@ -5,7 +5,6 @@ import contextlib
 import io
 import os
 import shlex
-import shutil
 import sys
 import tempfile
 import typing as t
@@ -98,6 +97,18 @@ class StreamMixer:
         self.output: io.BytesIO = io.BytesIO()
         self.stdout: io.BytesIO = BytesIOCopy(copy_to=self.output)
         self.stderr: io.BytesIO = BytesIOCopy(copy_to=self.output)
+
+    def __del__(self) -> None:
+        """
+        Guarantee that embedded file-like objects are closed in a
+        predictable order, protecting against races between
+        self.output being closed and other streams being flushed on close
+
+        .. versionadded:: 8.2.2
+        """
+        self.stderr.close()
+        self.stdout.close()
+        self.output.close()
 
 
 class _NamedTextIOWrapper(io.TextIOWrapper):
@@ -341,7 +352,10 @@ class CliRunner:
         @_pause_echo(echo_input)  # type: ignore
         def visible_input(prompt: str | None = None) -> str:
             sys.stdout.write(prompt or "")
-            val = text_input.readline().rstrip("\r\n")
+            try:
+                val = next(text_input).rstrip("\r\n")
+            except StopIteration as e:
+                raise EOFError() from e
             sys.stdout.write(f"{val}\n")
             sys.stdout.flush()
             return val
@@ -350,7 +364,10 @@ class CliRunner:
         def hidden_input(prompt: str | None = None) -> str:
             sys.stdout.write(f"{prompt or ''}\n")
             sys.stdout.flush()
-            return text_input.readline().rstrip("\r\n")
+            try:
+                return next(text_input).rstrip("\r\n")
+            except StopIteration as e:
+                raise EOFError() from e
 
         @_pause_echo(echo_input)  # type: ignore
         def _getchar(echo: bool) -> str:
@@ -510,6 +527,7 @@ class CliRunner:
                 exc_info = sys.exc_info()
             finally:
                 sys.stdout.flush()
+                sys.stderr.flush()
                 stdout = outstreams[0].getvalue()
                 stderr = outstreams[1].getvalue()
                 output = outstreams[2].getvalue()
@@ -551,6 +569,8 @@ class CliRunner:
             os.chdir(cwd)
 
             if temp_dir is None:
+                import shutil
+
                 try:
                     shutil.rmtree(dt)
                 except OSError:
