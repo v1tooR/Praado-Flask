@@ -12,117 +12,209 @@
 
 <div class="container my-5">
 
-    {% if produtos %}
-    <div class="row">
-        <!-- Coluna dos Itens do Carrinho -->
-        <div class="col-lg-8">
-            <div class="card">
-                <div class="card-header">
-                    <!-- O |length é um filtro do Jinja2 que conta os itens da lista -->
-                    <h5 class="mb-0">Seus Itens ({{ produtos|length }})</h5>
+    <div id="carrinho-com-itens" class="{% if not produtos %}d-none{% endif %}">
+        {% if produtos %}
+        <div class="row">
+            <!-- Coluna dos Itens do Carrinho -->
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Seus Itens ({{ produtos|length }})</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <ul class="list-group list-group-flush">
+                            {% for item in produtos %}
+                            <li class="list-group-item p-3" data-produto-id="{{ item.id }}">
+                                <div class="row g-3 align-items-center">
+                                    <div class="col-3 col-md-2">
+                                        <img src="{{ item.image_url }}" alt="{{ item.nome }}" class="img-fluid" style="border: 1px solid var(--border-color);">
+                                    </div>
+                                    <div class="col-9 col-md-5">
+                                        <h6 class="mb-1">{{ item.nome }}</h6>
+                                        <form method="post" action="{{ url_for('remover_do_carrinho', produto_id=item.id|int) }}" class="mt-1 form-remove-item">
+                                            <button type="submit" class="btn btn-link text-danger p-0" style="font-size: 0.8rem; text-decoration: none;">
+                                                <i class="fas fa-trash-alt me-1"></i> Remover
+                                            </button>
+                                        </form>
+                                    </div>
+                                    <div class="col-4 col-md-2">
+                                        <form method="post" action="{{ url_for('atualizar_carrinho', produto_id=item.id|int) }}" class="form-atualiza-quantidade">
+                                            <label for="qtd-{{ item.id }}" class="form-label" style="font-size: 0.8rem;">Qtd:</label>
+                                            <input type="number" class="form-control form-control-sm" id="qtd-{{ item.id }}" name="quantidade" value="{{ item.quantidade }}" min="1">
+                                        </form>
+                                    </div>
+                                    <div class="col-8 col-md-3 text-md-end">
+                                        <span class="text-muted item-quantidade" style="font-size: 0.9rem;">
+                                            {{ item.quantidade }} x R$ {{ "%.2f"|format(item.preco) }}
+                                        </span>
+                                        <h6 class="mb-0 item-total">R$ {{ "%.2f"|format(item.preco * item.quantidade) }}</h6>
+                                    </div>
+                                </div>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <div class="card-footer p-3 text-end">
+                        <a href="{{ url_for('catalogo') }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Continuar Comprando
+                        </a>
+                    </div>
                 </div>
-                <div class="card-body p-0">
-                    <!-- Lista de produtos -->
-                    <ul class="list-group list-group-flush">
+            </div>
 
-                        <!-- Loop Jinja2 para exibir cada produto -->
-                        {% for item in produtos %}
-                        <li class="list-group-item p-3">
-                            <div class="row g-3 align-items-center">
-                                <!-- Imagem -->
-                                <div class="col-3 col-md-2">
-                                    <img src="{{ item.imagem_url }}" alt="{{ item.nome }}" class="img-fluid" style="border: 1px solid var(--border-color);">
-                                </div>
-                                <!-- Detalhes do Produto -->
-                                <div class="col-9 col-md-5">
-                                    <h6 class="mb-1">{{ item.nome }}</h6>
+            <div class="col-lg-4 mt-4 mt-lg-0">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Resumo do Pedido</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <form class="d-flex mb-3">
+                            <input type="text" class="form-control me-2" placeholder="Código do cupom">
+                            <button class="btn btn-secondary" type="submit">Aplicar</button>
+                        </form>
 
-                                    <a href="#" class="text-danger" style="font-size: 0.8rem; text-decoration: none;">
-                                        <i class="fas fa-trash-alt me-1"></i> Remover
-                                    </a>
-                                </div>
-                                <!-- Quantidade -->
-                                <div class="col-4 col-md-2">
-                                    <label for="qtd-{{ item.id }}" class="form-label" style="font-size: 0.8rem;">Qtd:</label>
-                                    <input type="number" class="form-control form-control-sm" id="qtd-{{ item.id }}" value="{{ item.quantidade }}" min="1">
-                                </div>
-                                <!-- Preço -->
-                                <div class="col-8 col-md-3 text-md-end">
-                                    <span class="text-muted" style="font-size: 0.9rem;">
-                                        {{ item.quantidade }} x R$ {{ "%.2f"|format(item.preco) }}
-                                    </span>
-                                    <h6 class="mb-0">R$ {{ "%.2f"|format(item.preco * item.quantidade) }}</h6>
-                                </div>
-                            </div>
-                        </li>
-                        {% endfor %}
-                    </ul>
-                </div>
-                <div class="card-footer p-3 text-end">
-                    <!-- Botão de voltar (usa o estilo 'btn-secondary' que definimos) -->
-                    <a href="{{ url_for('catalogo') }}" class="btn btn-secondary">
-                        <i class="fas fa-arrow-left me-2"></i>Continuar Comprando
-                    </a>
+                        <hr>
+
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                Subtotal
+                                <span id="subtotal-valor">R$ {{ "%.2f"|format(subtotal) }}</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                Frete
+                                <span id="frete-valor">R$ {{ "%.2f"|format(frete) }}</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center px-0 fw-bold" style="font-size: 1.2rem;">
+                                Total
+                                <span id="total-valor">R$ {{ "%.2f"|format(total) }}</span>
+                            </li>
+                        </ul>
+
+                        <div class="d-grid mt-4">
+                            <a href="#" class="btn btn-primary">
+                                <i class="fas fa-lock me-2"></i>Finalizar Compra
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
+        {% endif %}
+    </div>
 
-        <!-- Coluna do Resumo do Pedido -->
-        <div class="col-lg-4 mt-4 mt-lg-0">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0">Resumo do Pedido</h5>
-                </div>
-                <div class="card-body p-4">
-                    <!-- Cupom -->
-                    <form class="d-flex mb-3">
-                        <input type="text" class="form-control me-2" placeholder="Código do cupom">
-                        <button class="btn btn-secondary" type="submit">Aplicar</button>
-                    </form>
-
-                    <hr>
-
-                    <!-- Totais -->
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
-                            Subtotal
-                            <span>R$ {{ "%.2f"|format(subtotal) }}</span>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
-                            Frete
-                            <span>R$ {{ "%.2f"|format(frete) }}</span>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between align-items-center px-0 fw-bold" style="font-size: 1.2rem;">
-                            Total
-                            <span>R$ {{ "%.2f"|format(total) }}</span>
-                        </li>
-                    </ul>
-
-                    <!-- Botão de Finalizar (usa o estilo 'btn-primary' preto) -->
-                    <div class="d-grid mt-4">
-                        <a href="#" class="btn btn-primary">
-                            <i class="fas fa-lock me-2"></i>Finalizar Compra
-                        </a>
+    <div id="carrinho-vazio" class="{% if produtos %}d-none{% endif %}">
+        <div class="row justify-content-center">
+            <div class="col-md-8 text-center">
+                <div class="card">
+                    <div class="card-body p-5">
+                        <i class="fas fa-shopping-cart fa-3x text-muted mb-3"></i>
+                        <h3 class="mb-3">Seu carrinho está vazio</h3>
+                        <p class="text-muted">Parece que você ainda não adicionou nenhum item.</p>
+                        <a href="{{ url_for('catalogo') }}" class="btn btn-primary mt-3">Ver Catálogo</a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    {% else %}
-    <!-- O que mostrar se o carrinho estiver vazio -->
-    <div class="row justify-content-center">
-        <div class="col-md-8 text-center">
-            <div class="card">
-                <div class="card-body p-5">
-                    <i class="fas fa-shopping-cart fa-3x text-muted mb-3"></i>
-                    <h3 class="mb-3">Seu carrinho está vazio</h3>
-                    <p class="text-muted">Parece que você ainda não adicionou nenhum item.</p>
-                    <a href="{{ url_for('catalogo') }}" class="btn btn-primary mt-3">Ver Catálogo</a>
-                </div>
-            </div>
-        </div>
-    </div>
-    {% endif %}
 
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const formatCurrency = (value) => Number(value || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    const subtotalSpan = document.getElementById('subtotal-valor');
+    const freteSpan = document.getElementById('frete-valor');
+    const totalSpan = document.getElementById('total-valor');
+    const cartCountBadge = document.getElementById('cart-count');
+    const containerItens = document.getElementById('carrinho-com-itens');
+    const emptyState = document.getElementById('carrinho-vazio');
+
+    const atualizarTotais = (data) => {
+        if (subtotalSpan) subtotalSpan.textContent = formatCurrency(data.subtotal);
+        if (freteSpan) freteSpan.textContent = formatCurrency(data.frete);
+        if (totalSpan) totalSpan.textContent = formatCurrency(data.total);
+    };
+
+    const atualizarBadge = (count) => {
+        if (!cartCountBadge) return;
+        if (count > 0) {
+            cartCountBadge.textContent = count;
+            cartCountBadge.classList.remove('d-none');
+        } else {
+            cartCountBadge.textContent = '';
+            cartCountBadge.classList.add('d-none');
+        }
+    };
+
+    const atualizarVisibilidade = (count) => {
+        if (!containerItens || !emptyState) return;
+        if (count > 0) {
+            containerItens.classList.remove('d-none');
+            emptyState.classList.add('d-none');
+        } else {
+            containerItens.classList.add('d-none');
+            emptyState.classList.remove('d-none');
+        }
+    };
+
+    const atualizarLinha = (item) => {
+        if (!item) return;
+        const linha = document.querySelector(`[data-produto-id="${item.id}"]`);
+        if (!linha) return;
+        const spanQuantidade = linha.querySelector('.item-quantidade');
+        const spanTotal = linha.querySelector('.item-total');
+        const inputQuantidade = linha.querySelector('input[name="quantidade"]');
+        if (spanQuantidade) spanQuantidade.textContent = `${item.quantidade} x ${formatCurrency(item.preco)}`;
+        if (spanTotal) spanTotal.textContent = formatCurrency(item.preco * item.quantidade);
+        if (inputQuantidade) inputQuantidade.value = item.quantidade;
+    };
+
+    const removerLinha = (id) => {
+        const linha = document.querySelector(`[data-produto-id="${id}"]`);
+        if (linha) linha.remove();
+    };
+
+    const enviarFormulario = (form) => {
+        const formData = new FormData(form);
+        fetch(form.action, {
+            method: form.method,
+            headers: { 'Accept': 'application/json' },
+            body: formData
+        })
+        .then((response) => {
+            if (!response.ok) throw new Error('Erro ao atualizar o carrinho.');
+            return response.json();
+        })
+        .then((data) => {
+            if (data.removed_id !== undefined) {
+                removerLinha(data.removed_id);
+            }
+            if (data.updated_item) {
+                atualizarLinha(data.updated_item);
+            }
+            atualizarTotais(data);
+            atualizarBadge(data.count);
+            atualizarVisibilidade(data.count);
+        })
+        .catch((error) => console.error(error));
+    };
+
+    document.querySelectorAll('.form-atualiza-quantidade').forEach((form) => {
+        const input = form.querySelector('input[name="quantidade"]');
+        if (!input) return;
+        input.addEventListener('change', () => enviarFormulario(form));
+        form.addEventListener('submit', (event) => {
+            event.preventDefault();
+            enviarFormulario(form);
+        });
+    });
+
+    document.querySelectorAll('.form-remove-item').forEach((form) => {
+        form.addEventListener('submit', (event) => {
+            event.preventDefault();
+            enviarFormulario(form);
+        });
+    });
+});
+</script>
 {% endblock %}

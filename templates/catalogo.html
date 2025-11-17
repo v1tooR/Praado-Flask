@@ -71,7 +71,7 @@
                                 <div class="card-body d-flex flex-column">
                                     <h2 class="card-title fs-6 fw-semibold text-light">{{ produto.nome }}</h2>
                                     <div class="mt-auto">
-                                        <img src= {{ produto.image_url }} class="card-img-top p-3" alt={{ produto.name }}>
+                                        <img src="{{ produto.image_url }}" class="card-img-top p-3" alt="{{ produto.nome }}">
                                         <p class="h4 fw-bold text-danger mb-1">R$ {{ produto.preco }}</p>
                                         <p class="text-success small">à vista com 15% de desconto no PIX</p>
                                         <p class="text-secondary"><small>Sem juros no cartão</small></p>

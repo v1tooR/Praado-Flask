@@ -12,7 +12,7 @@
 <input type="hidden" name="produto_id" value={{ produto.id }}>
 <input type="hidden" name="preco" value={{ produto.preco }}>
 <input type="hidden" name="nome" value={{ produto.nome }}>
-<input type="hidden" name="imagem_url" value={{ produto.imagem_url }}>
+<input type="hidden" name="image_url" value="{{ produto.image_url }}">
 
 
 
@@ -21,7 +21,7 @@
         <div class="row g-5">
             <!-- Coluna da Imagem -->
             <div class="col-md-6 text-center">
-                <img src="{{ produto.imagem_url }}" alt="{{ produto.nome }}" class="product-image">
+                <img src="{{ produto.image_url }}" alt="{{ produto.nome }}" class="product-image">
             </div>
 
             <!-- Coluna de Informações do Produto -->

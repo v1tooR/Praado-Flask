@@ -1,0 +1,166 @@
+{% extends 'base.html' %}
+
+{% block title %}Meu Perfil{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div class="container text-center">
+        <h1 class="page-title">MEU PERFIL</h1>
+        <p class="page-subtitle">Gerencie suas informações pessoais e permissões de acesso</p>
+    </div>
+</section>
+
+<div class="container pb-5">
+    <div class="row g-4">
+        <div class="col-lg-5">
+            <div class="card h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Informações básicas</h5>
+                    {% if conta['is_admin'] %}
+                        <span class="badge bg-warning text-dark">Administrador</span>
+                    {% else %}
+                        <span class="badge bg-secondary">Cliente</span>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    <p class="mb-2"><strong>Nome:</strong> {{ conta['nickname'] }}</p>
+                    <p class="mb-2"><strong>Email:</strong> {{ conta['email'] }}</p>
+                    <p class="mb-4"><strong>Status:</strong> {{ 'Administrador' if conta['is_admin'] else 'Cliente' }}</p>
+                    <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#alterarSenhaModal">
+                        <i class="fas fa-key me-2"></i>Alterar senha
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        {% if conta['is_admin'] %}
+        <div class="col-lg-7">
+            <div class="card h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Gerenciamento de usuários</h5>
+                    <span class="text-uppercase small text-muted">Modo Admin</span>
+                </div>
+                <div class="card-body p-0">
+                    {% if usuarios %}
+                        <div class="table-responsive">
+                            <table class="table mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Usuário</th>
+                                        <th>Email</th>
+                                        <th class="text-center">Admin</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                {% for usuario in usuarios %}
+                                    <tr data-usuario-id="{{ usuario['id'] }}">
+                                        <td>{{ usuario['nickname'] }}</td>
+                                        <td>{{ usuario['email'] }}</td>
+                                        <td class="text-center">
+                                            <form method="post" action="{{ url_for('toggle_admin', user_id=usuario['id']) }}" class="form-toggle-admin">
+                                                <div class="form-check form-switch d-inline-flex justify-content-center">
+                                                    <input class="form-check-input" type="checkbox" role="switch" {% if usuario['is_admin'] %}checked{% endif %}>
+                                                </div>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="p-4">
+                            <p class="mb-0 text-muted">Ainda não existem outros usuários para gerenciar.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Modal de alteração de senha -->
+<div class="modal fade" id="alterarSenhaModal" tabindex="-1" aria-labelledby="alterarSenhaModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="alterarSenhaModalLabel">Alterar senha</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <form method="post" action="{{ url_for('alterar_senha') }}">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="senha_atual" class="form-label">Senha atual</label>
+                        <input type="password" class="form-control" id="senha_atual" name="senha_atual" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="nova_senha" class="form-label">Nova senha</label>
+                        <input type="password" class="form-control" id="nova_senha" name="nova_senha" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="confirmar_senha" class="form-label">Confirmar nova senha</label>
+                        <input type="password" class="form-control" id="confirmar_senha" name="confirmar_senha" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Salvar nova senha</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const formatSwitchState = (input, isAdmin) => {
+        if (isAdmin) {
+            input.setAttribute('checked', 'checked');
+        } else {
+            input.removeAttribute('checked');
+        }
+        input.checked = !!isAdmin;
+    };
+
+    document.querySelectorAll('.form-toggle-admin').forEach((form) => {
+        const input = form.querySelector('input[type="checkbox"]');
+        if (!input) {
+            return;
+        }
+
+        input.addEventListener('change', function (event) {
+            event.preventDefault();
+            const formData = new FormData(form);
+            fetch(form.action, {
+                method: 'POST',
+                headers: { 'Accept': 'application/json' },
+                body: formData
+            })
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error('Erro ao atualizar privilégios.');
+                }
+                return response.json();
+            })
+            .then((data) => {
+                formatSwitchState(input, data.target_is_admin);
+                if (data.nickname && data.message) {
+                    const mensagem = `${data.nickname} ${data.message}`;
+                    const alert = document.createElement('div');
+                    alert.className = 'alert alert-success alert-dismissible fade show mt-3';
+                    alert.innerHTML = `
+                        ${mensagem}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    `;
+                    document.querySelector('main').prepend(alert);
+                }
+            })
+            .catch(() => {
+                // Reverte visualmente o estado caso ocorra erro
+                input.checked = !input.checked;
+            });
+        });
+    });
+});
+</script>
+{% endblock %}
