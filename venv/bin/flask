@@ -1,4 +1,4 @@
-#!/home/victor/Praado-Flask/venv/bin/python3
+#!/home/joaopedrosc/Praado-Flask-fork/venv/bin/python3
 # -*- coding: utf-8 -*-
 import re
 import sys

@@ -6,7 +6,7 @@
     <title>{% block title %}Sistema de Gerenciamento de Produtos{% endblock %}</title>
     <!-- Bootstrap CSS 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">-->
-    <link rel="icon" type="image/x-icon" href="https://cdn-cidkh.nitrocdn.com/tfwjTsWlaTjSOGniYYQlwEVktHLEPDDQ/assets/images/optimized/rev-a8b5b2c/praadostore.com.br/wp-content/uploads/2025/02/2-1.png">
+    <link rel="icon" type="image/png" href="{{ url_for('media_files', filename='AA.png') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -29,6 +29,13 @@
             font-family: 'Montserrat', sans-serif;
             background-color: var(--secondary-color);
             color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        
+        main {
+            flex: 1 0 auto;
         }
         
         .navbar {
@@ -195,7 +202,7 @@
             background-color: var(--primary-color);
             color: var(--secondary-color);
             padding: 2rem 0;
-            margin-top: 4rem;
+            margin-top: auto;
         }
         
         .footer a {
@@ -209,8 +216,13 @@
         
         .logo {
             display: flex;
-            align-items: left;
-            justify-content: left;
+            align-items: center;
+            justify-content: flex-start;
+        }
+        
+        .logo img {
+            height: auto;
+            max-height: 40px;
         }
         
         .logo-square {
@@ -287,17 +299,17 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container">
-            <a class="navbar-brand" href="{{ url_for('index') }}">
+            <a class="navbar-brand" href="{{ url_for('home') }}">
                 <div class="logo">
-                    <div class="logo"><img width="40px" src="https://cdn-cidkh.nitrocdn.com/tfwjTsWlaTjSOGniYYQlwEVktHLEPDDQ/assets/images/optimized/rev-a8b5b2c/praadostore.com.br/wp-content/uploads/2025/02/2-1.png"></img></div>
+                    <img width="40" height="40" src="{{ url_for('media_files', filename='AA.png') }}" alt="PRAADO STORE">
                 </div>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    {% if session.is_admin %}
+                <ul class="navbar-nav me-auto">
+                    {% if session.get('is_admin') %}
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('index') }}">GERENCIADOR DE INVENTÁRIO</a>
 
@@ -309,23 +321,29 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('catalogo') }}">CATÁLOGO</a>
                     </li>
-                    {% if session.is_logged %}
-
+                </ul>
+                <ul class="navbar-nav ms-auto align-items-lg-center">
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('carrinho') }}">
-                                <img width="20px" src="https://img.icons8.com/?size=100&id=9671&format=png&color=000000" style="filter: invert(100%);" ></img>
-                        </a>
-                    </li><li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('logout') }}">
-                                <img width="20px" src="https://img.icons8.com/?size=100&id=n5UlZzfuGwnQ&format=png&color=000000" style="filter: invert(100%);" ></img>
+                        <a class="nav-link d-flex align-items-center" href="{{ url_for('carrinho') if session.get('is_logged') else url_for('login') }}" title="Carrinho">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span id="cart-count" class="badge bg-light text-dark ms-1 {% if not session.get('carrinho') %}d-none{% endif %}">
+                                {{ session.get('carrinho', [])|length }}
+                            </span>
                         </a>
                     </li>
+                    {% if session.get('is_logged') %}
+                        <li class="nav-item">
+                            <a class="nav-link text-uppercase small text-white" href="{{ url_for('perfil') }}">Olá, {{ session.get('nickname', 'Cliente') }}</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link d-flex align-items-center" href="{{ url_for('logout') }}">
+                                <i class="fas fa-sign-out-alt me-2"></i>Sair
+                            </a>
+                        </li>
                     {% else %}
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('login') }}">
-                                <img width="20px" src="https://img.icons8.com/?size=100&id=26218&format=png&color=000000" style="filter: invert(100%);" ></img>
-                            </a>
-                    </li>
+                            <a class="nav-link" href="{{ url_for('login') }}">Entrar</a>
+                        </li>
                     {% endif %}
 
                 </ul>
